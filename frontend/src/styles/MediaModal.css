@@ -1,0 +1,237 @@
+/* =========================
+   OVERLAY
+========================= */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+
+  background: rgba(0, 0, 0, 0.85);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  z-index: 9999;
+  padding: 15px;
+}
+
+/* =========================
+   MODAL
+========================= */
+
+.modal-content {
+  position: relative;
+
+  width: 100%;
+  max-width: 1000px;
+  max-height: 90vh;
+
+  overflow-y: auto;
+
+  background: #fff;
+  border-radius: 20px;
+
+  padding: 20px;
+
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.modal-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 20px;
+}
+
+/* =========================
+   CLOSE BUTTON
+========================= */
+
+.close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+
+  width: 48px;
+  height: 48px;
+
+  border: none;
+  border-radius: 50%;
+
+  background: rgba(0, 0, 0, 0.85);
+  color: white;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  cursor: pointer;
+
+  z-index: 1000;
+}
+
+.close-btn:hover {
+  transform: scale(1.08);
+}
+
+/* =========================
+   AD SCREEN
+========================= */
+
+.ad-screen {
+  width: 100%;
+}
+
+.modal-ad {
+  width: 100%;
+}
+
+.modal-ad .ad-card {
+  width: 100%;
+
+  border: none;
+  box-shadow: none;
+  background: transparent;
+
+  cursor: pointer;
+}
+
+.modal-ad .ad-image-wrapper {
+  width: 100%;
+}
+
+.modal-ad .ad-image {
+  width: 100%;
+  max-height: 70vh;
+
+  object-fit: contain;
+
+  display: block;
+
+  margin: 0 auto;
+  border-radius: 16px;
+}
+
+.modal-ad .ad-content {
+  text-align: center;
+  padding-top: 15px;
+}
+
+.modal-ad .ad-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #111;
+}
+
+.modal-ad .ad-views {
+  color: #666;
+  margin-top: 8px;
+}
+
+.modal-ad .ad-btn {
+  margin-top: 15px;
+
+  padding: 12px 24px;
+
+  border: none;
+  border-radius: 12px;
+
+  background: #111;
+  color: white;
+
+  cursor: pointer;
+}
+
+/* =========================
+   MEDIA
+========================= */
+
+.modal-media {
+  width: 100%;
+  max-height: 600px;
+
+  object-fit: contain;
+
+  display: block;
+
+  border-radius: 14px;
+}
+
+/* =========================
+   PROMPTS
+========================= */
+
+.prompt-section {
+  margin-top: 20px;
+}
+
+.prompt-section h3 {
+  margin-bottom: 8px;
+  color: #111;
+}
+
+.prompt-text {
+  margin-bottom: 20px;
+
+  font-size: 15px;
+  line-height: 1.7;
+
+  color: #333;
+
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* =========================
+   COPY BUTTON
+========================= */
+
+.copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 12px 18px;
+
+  border: none;
+  border-radius: 12px;
+
+  background: #111;
+  color: white;
+
+  cursor: pointer;
+}
+
+.copy-btn:hover {
+  opacity: 0.9;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 768px) {
+  .modal-content {
+    padding: 15px;
+    max-height: 95vh;
+  }
+
+  .modal-ad .ad-image {
+    max-height: 50vh;
+  }
+
+  .modal-media {
+    max-height: 350px;
+  }
+
+  .close-btn {
+    width: 42px;
+    height: 42px;
+
+    top: 10px;
+    right: 10px;
+  }
+}

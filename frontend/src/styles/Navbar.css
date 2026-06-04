@@ -1,0 +1,92 @@
+.navbar {
+  position: fixed;
+  bottom: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  width: 340px;
+  height: 70px;
+
+  background: #ffffff;
+  border-radius: 20px;
+
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+
+  z-index: 1000;
+}
+
+.nav-links {
+  height: 100%;
+
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+
+  list-style: none;
+}
+
+.nav-links li {
+  height: 100%;
+}
+
+.nav-links a,
+.search-btn {
+  height: 100%;
+  width: 70px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  text-decoration: none;
+  border: none;
+  background: none;
+
+  color: #666;
+  cursor: pointer;
+
+  transition: all 0.3s ease;
+}
+
+.nav-links a span,
+.search-btn span {
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+/* Hover */
+
+.nav-links a:hover,
+.search-btn:hover {
+  color: #29fd53;
+  transform: translateY(-3px);
+}
+
+/* Active Route */
+
+.nav-links a.active {
+  color: #29fd53;
+}
+
+.nav-links a.active svg {
+  transform: translateY(-3px);
+}
+
+.nav-links a.active span {
+  font-weight: 600;
+}
+
+/* Mobile */
+
+@media (max-width: 480px) {
+  .navbar {
+    width: 95%;
+    bottom: 10px;
+  }
+
+  .nav-links a,
+  .search-btn {
+    width: 60px;
+  }
+}

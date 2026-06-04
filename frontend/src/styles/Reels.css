@@ -1,0 +1,107 @@
+.reels-categories {
+  position: fixed;
+  top: 60px;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.8);
+}
+.reels-categories {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+
+  z-index: 1000;
+
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.9);
+}
+
+.reels-container {
+  height: 100vh;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  background: #000;
+  scrollbar-width: none;
+}
+
+.reels-container::-webkit-scrollbar {
+  display: none;
+}
+
+.reel-item {
+  height: 100vh;
+  scroll-snap-align: start;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #000;
+}
+
+.reel-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.reel-video {
+  width: 100%;
+  max-width: 500px;
+  height: 90vh;
+  object-fit: contain;
+  background: #000;
+}
+
+.reel-bottom {
+  position: absolute;
+  bottom: 20%;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+}
+
+.prompt-btn,
+.mute-btn {
+  border: none;
+  border-radius: 30px;
+  padding: 12px 24px;
+  background: #fff;
+  color: #000;
+  font-weight: 600;
+  cursor: pointer;
+}
+.ad-reel {
+  width: 100%;
+  max-width: 420px;
+  margin: auto;
+}
+
+.ad-reel .ad-card {
+  width: 100%;
+}
+
+.ad-reel img {
+  width: 100%;
+  border-radius: 12px;
+}
+
+@media (max-width: 768px) {
+  .reel-video {
+    width: 100%;
+    max-width: 100%;
+    height: 100vh;
+  }
+
+  .reel-bottom {
+    bottom: 80px;
+    flex-wrap: wrap;
+  }
+}

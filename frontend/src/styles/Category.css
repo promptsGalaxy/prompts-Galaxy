@@ -1,0 +1,30 @@
+.category-navbar {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 15px;
+  scrollbar-width: none;
+}
+
+.category-navbar::-webkit-scrollbar {
+  display: none;
+}
+
+.category-btn {
+  border: none;
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: #f1f1f1;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: 0.3s;
+}
+
+.category-btn:hover {
+  background: #ddd;
+}
+
+.category-btn.active {
+  background: #000;
+  color: #fff;
+}
