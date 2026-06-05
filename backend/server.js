@@ -13,11 +13,7 @@ connectDB();
 
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "https://prompts-website-five.vercel.app/",
-    ],
-    credentials: true,
+    origin: ["http://localhost:5173"],
   }),
 );
 app.use(express.json());

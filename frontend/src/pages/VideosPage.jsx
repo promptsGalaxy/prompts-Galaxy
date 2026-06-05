@@ -131,7 +131,7 @@ function VideosPage() {
             </div>
 
             {/* Ad Reel */}
-            {ads.length > 0 && (index + 1) % 3 === 0 && (
+            {ads.length > 0 && (index + 1) % 5 === 0 && (
               <div className="reel-item">
                 <div className="ad-reel">
                   <AdCard ad={ads[Math.floor(index / 3) % ads.length]} />
