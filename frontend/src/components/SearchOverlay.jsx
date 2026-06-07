@@ -38,21 +38,21 @@ function SearchOverlay({ close, openMedia }) {
       </div>
 
       <div className="search-grid">
-        {filteredPosts.map((item) => (
-          <div
-            key={item._id}
-            className="search-card"
-            onClick={() => {
-              openMedia(item);
-            }}
-          >
-            {item.mediaType === "image" ? (
-              <img src={item.mediaUrl} alt="" />
-            ) : (
-              <video src={item.mediaUrl} />
-            )}
-          </div>
-        ))}
+        {filteredPosts.length > 0
+          ? filteredPosts.map((item) => (
+              <div
+                key={item._id}
+                className="search-card"
+                onClick={() => openMedia(item)}
+              >
+                {item.mediaType === "image" ? (
+                  <img src={item.mediaUrl} alt="" />
+                ) : (
+                  <video src={item.mediaUrl} />
+                )}
+              </div>
+            ))
+          : search.trim() && <div className="no-results">No results found</div>}
       </div>
     </div>
   );
