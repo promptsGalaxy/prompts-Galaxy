@@ -4,6 +4,7 @@ import API from "../api";
 import CategoryFilter from "../components/CategoryFilter";
 import MediaModal from "../components/MediaModal";
 import AdCard from "../components/AdCard";
+import Loader from "../components/Loader";
 
 import "../styles/Reels.css";
 
@@ -14,6 +15,7 @@ function VideosPage() {
   const [selectedItem, setSelectedItem] = useState(null);
   const [muted, setMuted] = useState(true);
   const [ads, setAds] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const videoRefs = useRef([]);
 
@@ -39,6 +41,8 @@ function VideosPage() {
       videoRefs.current = [];
     } catch (err) {
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -88,6 +92,10 @@ function VideosPage() {
     return () => observer.disconnect();
   }, [videos]);
 
+  if (loading) {
+    return <Loader />;
+  }
+
   return (
     <>
       <div className="reels-categories">
@@ -114,18 +122,15 @@ function VideosPage() {
                 />
 
                 <div className="reel-bottom">
+                  <button className="mute-btn" onClick={() => setMuted(!muted)}>
+                    {muted ? "🔇 Unmute" : "🔊 Mute"}
+                  </button>
                   <button
                     className="prompt-btn"
                     onClick={() => setSelectedItem(item)}
                   >
                     View Prompt
                   </button>
-
-                  <button className="mute-btn" onClick={() => setMuted(!muted)}>
-                    {muted ? "🔇 Unmute" : "🔊 Mute"}
-                  </button>
-
-                  <div className="views-count">👁 {item.views || 0}</div>
                 </div>
               </div>
             </div>

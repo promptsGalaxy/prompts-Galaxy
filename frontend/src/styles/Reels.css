@@ -59,13 +59,14 @@
 
 .reel-bottom {
   position: absolute;
-  bottom: 20%;
-  left: 0;
-  right: 0;
+  right: 15px;
+  bottom: 120px;
+
   display: flex;
-  justify-content: center;
-  align-items: center;
+  flex-direction: column; /* vertical */
   gap: 12px;
+
+  left: auto;
 }
 
 .prompt-btn,
@@ -101,7 +102,7 @@
   }
 
   .reel-bottom {
-    bottom: 80px;
+    bottom: 150px;
     flex-wrap: wrap;
   }
 }

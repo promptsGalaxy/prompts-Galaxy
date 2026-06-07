@@ -8,6 +8,7 @@ function MediaModal({ item, closeModal }) {
   const [selectedAd, setSelectedAd] = useState(null);
   const [showAd, setShowAd] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [copied2, setCopied2] = useState(false);
 
   useEffect(() => {
     if (item?._id) {
@@ -20,6 +21,7 @@ function MediaModal({ item, closeModal }) {
       fetchRandomAd();
       setShowAd(true);
       setCopied(false);
+      setCopied2(false);
     }
   }, [item]);
 
@@ -49,6 +51,20 @@ function MediaModal({ item, closeModal }) {
 
       setTimeout(() => {
         setCopied(false);
+      }, 2000);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const copyPrompt2 = async () => {
+    try {
+      await navigator.clipboard.writeText(item.Prompt2);
+
+      setCopied2(true);
+
+      setTimeout(() => {
+        setCopied2(false);
       }, 2000);
     } catch (err) {
       console.log(err);
@@ -94,13 +110,19 @@ function MediaModal({ item, closeModal }) {
 
               <p className="prompt-text">{item.Prompt}</p>
 
-              {item.prompt2 && (
-                <>
-                  <h3>Prompt 2</h3>
-
-                  <p className="prompt-text">{item.prompt2}</p>
-                </>
-              )}
+              <button className="copy-btn" onClick={copyPrompt}>
+                {copied ? (
+                  <>
+                    <Check size={18} />
+                    <span>Copied</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy size={18} />
+                    <span>Copy Prompt</span>
+                  </>
+                )}
+              </button>
 
               {item.description && (
                 <>
@@ -109,21 +131,29 @@ function MediaModal({ item, closeModal }) {
                   <p className="prompt-text">{item.description}</p>
                 </>
               )}
-            </div>
 
-            <button className="copy-btn" onClick={copyPrompt}>
-              {copied ? (
+              {item.Prompt2 && (
                 <>
-                  <Check size={18} />
-                  <span>Copied</span>
-                </>
-              ) : (
-                <>
-                  <Copy size={18} />
-                  <span>Copy Prompt</span>
+                  <h3>Prompt 2</h3>
+
+                  <p className="prompt-text">{item.Prompt2}</p>
+
+                  <button className="copy-btn" onClick={copyPrompt2}>
+                    {copied2 ? (
+                      <>
+                        <Check size={18} />
+                        <span>Copied</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy size={18} />
+                        <span>Copy Prompt</span>
+                      </>
+                    )}
+                  </button>
                 </>
               )}
-            </button>
+            </div>
           </>
         )}
       </div>
