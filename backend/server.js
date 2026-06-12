@@ -13,7 +13,7 @@ connectDB();
 
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://prompts-galaxy.vercel.app/"],
+    origin: ["http://localhost:5173", "https://prompts-galaxy.vercel.app"],
   }),
 );
 app.use(express.json());
