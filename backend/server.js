@@ -188,6 +188,60 @@ app.get("/api/ads", async (req, res) => {
   }
 });
 
+app.post("/api/prompts", async (req, res) => {
+  try {
+    const prompt = await Prompt.create(req.body);
+
+    res.status(201).json(prompt);
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+    });
+  }
+});
+
+app.put("/api/prompts/:id", async (req, res) => {
+  try {
+    const updatedPrompt = await Prompt.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      {
+        new: true,
+        runValidators: true,
+      },
+    );
+
+    if (!updatedPrompt) {
+      return res.status(404).json({
+        message: "Prompt not found",
+      });
+    }
+
+    res.json(updatedPrompt);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+app.delete("/api/prompts/:id", async (req, res) => {
+  try {
+    const deletedPrompt = await Prompt.findByIdAndDelete(req.params.id);
+
+    if (!deletedPrompt) {
+      return res.status(404).json({
+        message: "Prompt not found",
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Deleted Successfully",
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 /* =========================
    AD VIEW COUNT
 ========================= */
