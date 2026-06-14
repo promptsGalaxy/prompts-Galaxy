@@ -64,7 +64,16 @@ app.get("/api/prompts", async (req, res) => {
 ========================= */
 app.get("/api/categories", async (req, res) => {
   try {
-    res.json(["men", "women", "couple", "kid"]);
+    res.json([
+      "men",
+      "women",
+      "couple",
+      "kid",
+      "editing",
+      "family",
+      "group",
+      "others",
+    ]);
   } catch (err) {
     res.status(500).json({
       message: err.message,
