@@ -1,11 +1,13 @@
-import { Fragment, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import API from "../api";
+import Masonry from "react-masonry-css";
 
 import MediaModal from "../components/MediaModal";
 import AdCard from "../components/AdCard";
+import Loader from "../components/Loader";
 
 import "../styles/Feed.css";
-import Loader from "../components/Loader";
+
 import { Play } from "lucide-react";
 
 function HomePage() {
@@ -13,10 +15,17 @@ function HomePage() {
   const [ads, setAds] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  const [visibleCount, setVisibleCount] = useState(5);
+  const [visibleCount, setVisibleCount] = useState(12);
 
   const loadMoreRef = useRef(null);
+
+  const breakpointColumnsObj = {
+    default: 4,
+    1400: 4,
+    1100: 3,
+    768: 2,
+    500: 1,
+  };
 
   useEffect(() => {
     fetchTrending();
@@ -45,29 +54,25 @@ function HomePage() {
 
   useEffect(() => {
     const observer = new IntersectionObserver(
-      (entries) => {
-        const target = entries[0];
-
-        if (target.isIntersecting && visibleCount < posts.length) {
-          setVisibleCount((prev) => prev + 10);
+      ([entry]) => {
+        if (entry.isIntersecting && visibleCount < posts.length) {
+          setVisibleCount((prev) => prev + 12);
         }
       },
       {
         threshold: 0.1,
-        rootMargin: "300px",
+        rootMargin: "400px",
       },
     );
 
-    const currentRef = loadMoreRef.current;
+    const current = loadMoreRef.current;
 
-    if (currentRef) {
-      observer.observe(currentRef);
+    if (current) {
+      observer.observe(current);
     }
 
     return () => {
-      if (currentRef) {
-        observer.unobserve(currentRef);
-      }
+      if (current) observer.unobserve(current);
       observer.disconnect();
     };
   }, [visibleCount, posts.length]);
@@ -78,19 +83,52 @@ function HomePage() {
 
   const visiblePosts = posts.slice(0, visibleCount);
 
+  const feedItems = [];
+
+  visiblePosts.forEach((post, index) => {
+    feedItems.push({
+      type: "post",
+      data: post,
+    });
+
+    // Every 8 posts ki oka ad
+    if (ads.length > 0 && (index + 1) % 5 === 0) {
+      feedItems.push({
+        type: "ad",
+        data: ads[Math.floor(index / 5) % ads.length],
+      });
+    }
+  });
+
   return (
     <>
-      <h2 className="trending-title">🔥 Trending Prompts</h2>
+      <h2 className="trending-title">Prompts Gallery</h2>
 
-      <div className="feed-grid">
-        {visiblePosts.map((post, index) => (
-          <Fragment key={post._id}>
-            <div className="feed-card" onClick={() => setSelectedItem(post)}>
-              {post.mediaType === "image" ? (
-                <img src={post.mediaUrl} alt="" loading="lazy" />
+      <Masonry
+        breakpointCols={breakpointColumnsObj}
+        className="masonry-grid"
+        columnClassName="masonry-column"
+      >
+        {feedItems.map((item, index) => {
+          if (item.type === "ad") {
+            return (
+              <div key={`ad-${index}`} className="feed-ad">
+                <AdCard ad={item.data} />
+              </div>
+            );
+          }
+
+          return (
+            <div
+              key={item.data._id}
+              className="feed-card"
+              onClick={() => setSelectedItem(item.data)}
+            >
+              {item.data.mediaType === "image" ? (
+                <img src={item.data.mediaUrl} alt="" loading="lazy" />
               ) : (
                 <>
-                  <video src={post.mediaUrl} preload="metadata" muted />
+                  <video src={item.data.mediaUrl} preload="metadata" muted />
 
                   <div className="video-badge">
                     <Play size={16} fill="white" />
@@ -98,15 +136,9 @@ function HomePage() {
                 </>
               )}
             </div>
-
-            {ads.length > 0 && (index + 1) % 5 === 0 && (
-              <div className="feed-ad">
-                <AdCard ad={ads[Math.floor(index / 5) % ads.length]} />
-              </div>
-            )}
-          </Fragment>
-        ))}
-      </div>
+          );
+        })}
+      </Masonry>
 
       {visibleCount < posts.length && (
         <div ref={loadMoreRef} className="load-more-trigger">

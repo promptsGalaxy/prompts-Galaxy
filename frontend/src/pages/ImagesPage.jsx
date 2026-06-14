@@ -1,5 +1,6 @@
-import { Fragment, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import API from "../api";
+import Masonry from "react-masonry-css";
 
 import CategoryFilter from "../components/CategoryFilter";
 import ImageCard from "../components/ImageCard";
@@ -21,6 +22,14 @@ function ImagesPage() {
   const [visibleCount, setVisibleCount] = useState(15);
 
   const loadMoreRef = useRef(null);
+
+  const breakpointColumnsObj = {
+    default: 5,
+    1400: 4,
+    1100: 3,
+    768: 2,
+    500: 1,
+  };
 
   useEffect(() => {
     setVisibleCount(15);
@@ -71,28 +80,26 @@ function ImagesPage() {
 
   useEffect(() => {
     const observer = new IntersectionObserver(
-      (entries) => {
-        const target = entries[0];
-
-        if (target.isIntersecting && visibleCount < images.length) {
-          setVisibleCount((prev) => Math.min(prev + 10, images.length));
+      ([entry]) => {
+        if (entry.isIntersecting && visibleCount < images.length) {
+          setVisibleCount((prev) => Math.min(prev + 15, images.length));
         }
       },
       {
         threshold: 0.1,
-        rootMargin: "300px",
+        rootMargin: "400px",
       },
     );
 
-    const currentRef = loadMoreRef.current;
+    const current = loadMoreRef.current;
 
-    if (currentRef) {
-      observer.observe(currentRef);
+    if (current) {
+      observer.observe(current);
     }
 
     return () => {
-      if (currentRef) {
-        observer.unobserve(currentRef);
+      if (current) {
+        observer.unobserve(current);
       }
 
       observer.disconnect();
@@ -105,6 +112,23 @@ function ImagesPage() {
 
   const visibleImages = images.slice(0, visibleCount);
 
+  const feedItems = [];
+
+  visibleImages.forEach((image, index) => {
+    feedItems.push({
+      type: "image",
+      data: image,
+    });
+
+    // Every 8 images ki oka ad
+    if (ads.length > 0 && (index + 1) % 5 === 0) {
+      feedItems.push({
+        type: "ad",
+        data: ads[Math.floor(index / 5) % ads.length],
+      });
+    }
+  });
+
   return (
     <>
       <CategoryFilter
@@ -113,19 +137,29 @@ function ImagesPage() {
         setSelectedCategory={setSelectedCategory}
       />
 
-      <div className="grid">
-        {visibleImages.map((item, index) => (
-          <Fragment key={item._id}>
-            <ImageCard item={item} setSelectedItem={setSelectedItem} />
-
-            {ads.length > 0 && (index + 1) % 5 === 0 && (
-              <div className="feed-ad">
-                <AdCard ad={ads[Math.floor(index / 5) % ads.length]} />
+      <Masonry
+        breakpointCols={breakpointColumnsObj}
+        className="masonry-grid"
+        columnClassName="masonry-column"
+      >
+        {feedItems.map((item, index) => {
+          if (item.type === "ad") {
+            return (
+              <div key={`ad-${index}`} className="feed-ad">
+                <AdCard ad={item.data} />
               </div>
-            )}
-          </Fragment>
-        ))}
-      </div>
+            );
+          }
+
+          return (
+            <ImageCard
+              key={item.data._id}
+              item={item.data}
+              setSelectedItem={setSelectedItem}
+            />
+          );
+        })}
+      </Masonry>
 
       {visibleCount < images.length && (
         <div ref={loadMoreRef} className="load-more-trigger">
