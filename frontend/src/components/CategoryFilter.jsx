@@ -1,4 +1,5 @@
 import "../styles/Category.css";
+
 function CategoryFilter({ categories, selectedCategory, setSelectedCategory }) {
   return (
     <div className="category-navbar">

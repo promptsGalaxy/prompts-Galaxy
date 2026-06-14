@@ -1,7 +1,12 @@
 const mongoose = require("mongoose");
 
 const ContactSchema = new mongoose.Schema({
-  Category: String,
+  Category: {
+    type: [String],
+    required: true,
+    validate: [(val) => val.length > 0, "Select at least one category"],
+  },
+
   mediaType: String,
   mediaUrl: String,
   Prompt: String,
@@ -13,4 +18,5 @@ const ContactSchema = new mongoose.Schema({
     default: 0,
   },
 });
+
 module.exports = mongoose.model("Prompt", ContactSchema);
