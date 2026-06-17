@@ -70,6 +70,7 @@ function SearchResultsPage() {
       <MediaModal
         item={selectedItem}
         closeModal={() => setSelectedItem(null)}
+        setSelectedItem={setSelectedItem}
       />
     </>
   );

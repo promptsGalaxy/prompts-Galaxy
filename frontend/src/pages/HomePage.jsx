@@ -149,7 +149,9 @@ function HomePage() {
       <MediaModal
         item={selectedItem}
         closeModal={() => setSelectedItem(null)}
+        setSelectedItem={setSelectedItem}
       />
+      <h2>see all posts in image section</h2>
     </>
   );
 }

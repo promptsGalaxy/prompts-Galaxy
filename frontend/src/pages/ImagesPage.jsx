@@ -170,6 +170,7 @@ function ImagesPage() {
       <MediaModal
         item={selectedItem}
         closeModal={() => setSelectedItem(null)}
+        setSelectedItem={setSelectedItem}
       />
     </>
   );

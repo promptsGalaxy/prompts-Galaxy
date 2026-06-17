@@ -6,6 +6,7 @@ const connectDB = require("./config/db");
 
 const Prompt = require("./Prompt");
 const Ad = require("./Ad");
+const Click = require("./Click");
 
 const app = express();
 
@@ -52,6 +53,17 @@ app.get("/api/prompts", async (req, res) => {
     ]);
 
     res.json(data);
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+    });
+  }
+});
+app.get("/api/click", async (req, res) => {
+  try {
+    const post = await Click.findOne();
+
+    res.json(post);
   } catch (err) {
     res.status(500).json({
       message: err.message,
@@ -137,15 +149,15 @@ app.get("/api/trending", async (req, res) => {
     const data = await Prompt.aggregate([
       {
         $sort: {
-          views: -1,
+          _id: -1, // latest posts first
         },
       },
       {
-        $limit: 100,
+        $limit: 100, // latest 100 posts
       },
       {
         $sample: {
-          size: 20,
+          size: 50, // shuffle those 100 posts
         },
       },
     ]);

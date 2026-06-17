@@ -4,7 +4,7 @@ import { X, Copy, Check } from "lucide-react";
 import API from "../api";
 import AdCard from "./AdCard";
 
-function MediaModal({ item, closeModal }) {
+function MediaModal({ item, closeModal, setSelectedItem }) {
   const [selectedAd, setSelectedAd] = useState(null);
   const [showAd, setShowAd] = useState(true);
   const [copied, setCopied] = useState(false);
@@ -24,6 +24,20 @@ function MediaModal({ item, closeModal }) {
       setCopied2(false);
     }
   }, [item]);
+
+  const openClickPost = async () => {
+    try {
+      const res = await API.get("/api/click");
+
+      // click collection lo first document
+      const clickPost = res.data;
+
+      // parent component ki pampali
+      setSelectedItem(clickPost);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   const fetchRandomAd = async () => {
     try {
@@ -106,10 +120,24 @@ function MediaModal({ item, closeModal }) {
             )}
 
             <div className="prompt-section">
+              <p>
+                If you are facing face mismatch issue in chatgpt then do this
+                setting
+              </p>
+              <h3
+                onClick={openClickPost}
+                style={{
+                  cursor: "pointer",
+                  color: "blue",
+                  textDecoration: "underline",
+                }}
+              >
+                Click
+              </h3>
+
+              <br />
               <h3>Prompt</h3>
-
               <p className="prompt-text">{item.Prompt}</p>
-
               <button className="copy-btn" onClick={copyPrompt}>
                 {copied ? (
                   <>
@@ -123,7 +151,6 @@ function MediaModal({ item, closeModal }) {
                   </>
                 )}
               </button>
-
               {item.description && (
                 <>
                   <h3>Description</h3>
@@ -131,7 +158,6 @@ function MediaModal({ item, closeModal }) {
                   <p className="prompt-text">{item.description}</p>
                 </>
               )}
-
               {item.Prompt2 && (
                 <>
                   <h3>Prompt 2</h3>
