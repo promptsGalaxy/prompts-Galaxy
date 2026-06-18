@@ -120,21 +120,6 @@ function MediaModal({ item, closeModal, setSelectedItem }) {
             )}
 
             <div className="prompt-section">
-              <p>
-                If you are facing face mismatch issue in chatgpt then do this
-                setting
-              </p>
-              <h3
-                onClick={openClickPost}
-                style={{
-                  cursor: "pointer",
-                  color: "blue",
-                  textDecoration: "underline",
-                }}
-              >
-                Click
-              </h3>
-
               <br />
               <h3>Prompt</h3>
               <p className="prompt-text">{item.Prompt}</p>
@@ -151,6 +136,7 @@ function MediaModal({ item, closeModal, setSelectedItem }) {
                   </>
                 )}
               </button>
+
               {item.description && (
                 <>
                   <h3>Description</h3>
@@ -179,6 +165,21 @@ function MediaModal({ item, closeModal, setSelectedItem }) {
                   </button>
                 </>
               )}
+
+              <p>
+                If you are facing face mismatch issue in chatgpt then do this
+                setting
+              </p>
+              <h3
+                onClick={openClickPost}
+                style={{
+                  cursor: "pointer",
+                  color: "blue",
+                  textDecoration: "underline",
+                }}
+              >
+                Click
+              </h3>
             </div>
           </>
         )}

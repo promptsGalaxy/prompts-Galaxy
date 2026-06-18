@@ -92,10 +92,10 @@ function HomePage() {
     });
 
     // Every 8 posts ki oka ad
-    if (ads.length > 0 && (index + 1) % 5 === 0) {
+    if (ads.length > 0 && (index + 1) % 6 === 0) {
       feedItems.push({
         type: "ad",
-        data: ads[Math.floor(index / 5) % ads.length],
+        data: ads[Math.floor(index / 6) % ads.length],
       });
     }
   });
