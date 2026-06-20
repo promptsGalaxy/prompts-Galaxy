@@ -1,0 +1,42 @@
+.logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+}
+
+.logo-text {
+  text-align: center;
+  line-height: 1;
+}
+
+.logo-text h1 {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  font-family: "Poppins", sans-serif;
+  background: linear-gradient(90deg, #4f46e5, #7c3aed, #06b6d4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.logo-text p {
+  margin: 2px 0 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 6px;
+  color: #666;
+  text-transform: uppercase;
+}
+
+@media (max-width: 768px) {
+  .logo-text h1 {
+    font-size: 28px;
+  }
+
+  .logo-text p {
+    font-size: 10px;
+    letter-spacing: 5px;
+  }
+}

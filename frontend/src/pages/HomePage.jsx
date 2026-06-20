@@ -9,6 +9,8 @@ import Loader from "../components/Loader";
 import "../styles/Feed.css";
 
 import { Play } from "lucide-react";
+import Title from "../components/Title";
+import Footer from "../components/Footer";
 
 function HomePage() {
   const [posts, setPosts] = useState([]);
@@ -102,8 +104,8 @@ function HomePage() {
 
   return (
     <>
-      <h2 className="trending-title">Prompts Gallery</h2>
-
+      <Title />
+      <br />
       <Masonry
         breakpointCols={breakpointColumnsObj}
         className="masonry-grid"
@@ -151,7 +153,7 @@ function HomePage() {
         closeModal={() => setSelectedItem(null)}
         setSelectedItem={setSelectedItem}
       />
-      <h2>see all posts in image section</h2>
+      <Footer />
     </>
   );
 }

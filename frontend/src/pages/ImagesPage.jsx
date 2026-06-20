@@ -9,6 +9,8 @@ import AdCard from "../components/AdCard";
 import Loader from "../components/Loader";
 
 import "../styles/Feed.css";
+import Title from "../components/Title";
+import Footer from "../components/Footer";
 
 function ImagesPage() {
   const [images, setImages] = useState([]);
@@ -131,6 +133,7 @@ function ImagesPage() {
 
   return (
     <>
+      <Title />
       <CategoryFilter
         categories={categories}
         selectedCategory={selectedCategory}
@@ -172,6 +175,7 @@ function ImagesPage() {
         closeModal={() => setSelectedItem(null)}
         setSelectedItem={setSelectedItem}
       />
+      <Footer />
     </>
   );
 }

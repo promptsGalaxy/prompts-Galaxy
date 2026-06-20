@@ -43,6 +43,7 @@ function SearchResultsPage() {
 
   return (
     <>
+      <Title />
       <h2 className="search-title">Search Results: {query}</h2>
 
       {loading && <p>Loading...</p>}

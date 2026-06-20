@@ -7,6 +7,7 @@ import AdCard from "../components/AdCard";
 import Loader from "../components/Loader";
 
 import "../styles/Reels.css";
+import Title from "../components/Title";
 
 function VideosPage() {
   const [videos, setVideos] = useState([]);
@@ -98,6 +99,7 @@ function VideosPage() {
 
   return (
     <>
+      <Title />
       <div className="reels-categories">
         <CategoryFilter
           categories={categories}
