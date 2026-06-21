@@ -137,6 +137,9 @@ function HomePage() {
                   </div>
                 </>
               )}
+              <div className="feed-card-btn">
+                <button className="view-btn">View Prompt</button>
+              </div>
             </div>
           );
         })}

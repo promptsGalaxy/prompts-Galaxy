@@ -17,13 +17,30 @@ const Footer = () => {
           </p>
 
           <div className="socials">
-            <a href="#">
+            <a
+              href="https://www.instagram.com/mvr_prompts?igsh=anBham9nc2h0Nmw3"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram"
+            >
               <FaInstagram />
             </a>
-            <a href="#">
+
+            <a
+              href="https://t.me/veerendra90"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Telegram"
+            >
               <FaTelegram />
             </a>
-            <a href="#">
+
+            <a
+              href="https://x.com/MVR_Prompts"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="X (Twitter)"
+            >
               <FaTwitter />
             </a>
           </div>

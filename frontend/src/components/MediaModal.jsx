@@ -105,6 +105,7 @@ function MediaModal({ item, closeModal, setSelectedItem }) {
             <button className="close-btn" onClick={closeModal}>
               <X size={24} />
             </button>
+            <h2>Scroll down to see the Prompt</h2>
 
             {item.mediaType === "image" ? (
               <img src={item.mediaUrl} alt="Prompt" className="modal-media" />
@@ -166,20 +167,13 @@ function MediaModal({ item, closeModal, setSelectedItem }) {
                 </>
               )}
 
-              <p>
+              <h2>
                 If you are facing face mismatch issue in chatgpt then do this
                 setting
-              </p>
-              <h3
-                onClick={openClickPost}
-                style={{
-                  cursor: "pointer",
-                  color: "blue",
-                  textDecoration: "underline",
-                }}
-              >
+              </h2>
+              <button onClick={openClickPost} className="copy-btn">
                 Click
-              </h3>
+              </button>
             </div>
           </>
         )}

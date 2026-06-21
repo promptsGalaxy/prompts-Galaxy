@@ -9,6 +9,9 @@ function ImageCard({ item, setSelectedItem }) {
         loading="lazy"
         decoding="async"
       />
+      <div className="feed-card-btn">
+        <button className="view-btn">View Prompt</button>
+      </div>
     </div>
   );
 }

@@ -284,6 +284,30 @@
   transform: scale(1.02);
 }
 
+/*view btn*/
+.feed-card-btn {
+  display: flex;
+  justify-content: center;
+  margin: 12px;
+}
+.view-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 12px 18px;
+
+  border: none;
+  border-radius: 12px;
+
+  background: #111;
+  color: white;
+
+  cursor: pointer;
+}
+
+.view-btn:hover {
+  opacity: 0.9;
+}
+
 /* =========================
    TABLET
 ========================= */

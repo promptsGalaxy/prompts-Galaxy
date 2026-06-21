@@ -16,8 +16,10 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      "https://prompts-galaxy.vercel.app",
       "https://prompts-admin-panel-devil.vercel.app",
+      "https://mvrprompts.vercel.app",
+      "https://mvrprompts.com",
+      "https://www.mvrprompts.com",
     ],
   }),
 );
