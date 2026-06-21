@@ -16,7 +16,10 @@
 /* =========================
    CARDS
 ========================= */
-
+.feed-ad {
+  width: 100%;
+  display: block;
+}
 .card,
 .feed-card,
 .feed-ad {

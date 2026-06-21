@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import API from "../api";
 import "../styles/SearchOverlay.css";
 
-function SearchOverlay({ close, openMedia }) {
+function SearchOverlay({ close }) {
+  const navigate = useNavigate();
+
   const [search, setSearch] = useState("");
   const [posts, setPosts] = useState([]);
 
@@ -22,6 +25,11 @@ function SearchOverlay({ close, openMedia }) {
   const filteredPosts = posts.filter((item) =>
     item.Prompt?.toLowerCase().includes(search.toLowerCase()),
   );
+
+  const openPrompt = (item) => {
+    close();
+    navigate(`/prompt/${item.slug}`);
+  };
 
   return (
     <div className="search-overlay">
@@ -43,12 +51,12 @@ function SearchOverlay({ close, openMedia }) {
               <div
                 key={item._id}
                 className="search-card"
-                onClick={() => openMedia(item)}
+                onClick={() => openPrompt(item)}
               >
                 {item.mediaType === "image" ? (
-                  <img src={item.mediaUrl} alt="" />
+                  <img src={item.mediaUrl} alt={item.Prompt} />
                 ) : (
-                  <video src={item.mediaUrl} />
+                  <video src={item.mediaUrl} muted preload="metadata" />
                 )}
               </div>
             ))

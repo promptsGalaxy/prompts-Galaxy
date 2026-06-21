@@ -5,7 +5,6 @@ import { Helmet } from "react-helmet-async";
 
 import CategoryFilter from "../components/CategoryFilter";
 import ImageCard from "../components/ImageCard";
-import MediaModal from "../components/MediaModal";
 import AdCard from "../components/AdCard";
 import Loader from "../components/Loader";
 
@@ -13,16 +12,28 @@ import "../styles/Feed.css";
 import Title from "../components/Title";
 import Footer from "../components/Footer";
 
+const CACHE_KEY = "images-cache";
+const SCROLL_KEY = "images-scroll";
+const VISIBLE_KEY = "images-visible";
+
 function ImagesPage() {
-  const [images, setImages] = useState([]);
+  const cache = sessionStorage.getItem(CACHE_KEY);
+
+  const [images, setImages] = useState(cache ? JSON.parse(cache).images : []);
+
   const [categories, setCategories] = useState([]);
   const [ads, setAds] = useState([]);
 
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  const [selectedItem, setSelectedItem] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState(
+    cache ? JSON.parse(cache).category : "all",
+  );
 
-  const [visibleCount, setVisibleCount] = useState(15);
+  const [loading, setLoading] = useState(!cache);
+
+  const [visibleCount, setVisibleCount] = useState(() => {
+    const saved = sessionStorage.getItem(VISIBLE_KEY);
+    return saved ? Number(saved) : 15;
+  });
 
   const loadMoreRef = useRef(null);
 
@@ -35,14 +46,34 @@ function ImagesPage() {
   };
 
   useEffect(() => {
-    setVisibleCount(15);
-    fetchImages();
-  }, [selectedCategory]);
-
-  useEffect(() => {
     fetchCategories();
     fetchAds();
   }, []);
+
+  useEffect(() => {
+    const cached = sessionStorage.getItem(CACHE_KEY);
+
+    if (cached) {
+      const data = JSON.parse(cached);
+
+      if (data.category === selectedCategory) {
+        setImages(data.images);
+        setLoading(false);
+
+        setTimeout(() => {
+          const scroll = sessionStorage.getItem(SCROLL_KEY);
+
+          if (scroll) {
+            window.scrollTo(0, Number(scroll));
+          }
+        }, 100);
+
+        return;
+      }
+    }
+
+    fetchImages();
+  }, [selectedCategory]);
 
   const fetchImages = async () => {
     try {
@@ -56,10 +87,26 @@ function ImagesPage() {
       });
 
       setImages(res.data);
+
+      sessionStorage.setItem(
+        CACHE_KEY,
+        JSON.stringify({
+          category: selectedCategory,
+          images: res.data,
+        }),
+      );
     } catch (err) {
-      console.error(err);
+      console.log(err);
     } finally {
       setLoading(false);
+
+      setTimeout(() => {
+        const scroll = sessionStorage.getItem(SCROLL_KEY);
+
+        if (scroll) {
+          window.scrollTo(0, Number(scroll));
+        }
+      }, 100);
     }
   };
 
@@ -68,7 +115,7 @@ function ImagesPage() {
       const res = await API.get("/api/categories");
       setCategories(res.data);
     } catch (err) {
-      console.error(err);
+      console.log(err);
     }
   };
 
@@ -76,10 +123,24 @@ function ImagesPage() {
     try {
       const res = await API.get("/api/ads");
       setAds(res.data);
-    } catch (err) {
-      console.log("No ads available");
-    }
+    } catch (err) {}
   };
+
+  useEffect(() => {
+    sessionStorage.setItem(VISIBLE_KEY, visibleCount);
+  }, [visibleCount]);
+
+  useEffect(() => {
+    const saveScroll = () => {
+      sessionStorage.setItem(SCROLL_KEY, window.scrollY);
+    };
+
+    window.addEventListener("scroll", saveScroll);
+
+    return () => {
+      window.removeEventListener("scroll", saveScroll);
+    };
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -89,29 +150,19 @@ function ImagesPage() {
         }
       },
       {
-        threshold: 0.1,
         rootMargin: "400px",
+        threshold: 0.1,
       },
     );
 
-    const current = loadMoreRef.current;
-
-    if (current) {
-      observer.observe(current);
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current);
     }
 
-    return () => {
-      if (current) {
-        observer.unobserve(current);
-      }
-
-      observer.disconnect();
-    };
+    return () => observer.disconnect();
   }, [visibleCount, images.length]);
 
-  if (loading) {
-    return <Loader />;
-  }
+  if (loading) return <Loader />;
 
   const visibleImages = images.slice(0, visibleCount);
 
@@ -123,8 +174,7 @@ function ImagesPage() {
       data: image,
     });
 
-    // Every 8 images ki oka ad
-    if (ads.length > 0 && (index + 1) % 6 === 0) {
+    if (ads.length && (index + 1) % 6 === 0) {
       feedItems.push({
         type: "ad",
         data: ads[Math.floor(index / 6) % ads.length],
@@ -136,26 +186,25 @@ function ImagesPage() {
     <>
       <Helmet>
         <title>AI Image Prompts | MVR Prompts</title>
-
-        <meta
-          name="description"
-          content="Browse premium AI image prompts for realistic portraits, fashion, cinematic scenes, couples, kids, fantasy, product photography and more."
-        />
-
-        <meta
-          name="keywords"
-          content="AI image prompts, Midjourney prompts, Flux prompts, realistic prompts, portrait prompts, image generation prompts"
-        />
       </Helmet>
 
       <Title />
+
       <CategoryFilter
         categories={categories}
         selectedCategory={selectedCategory}
-        setSelectedCategory={setSelectedCategory}
+        setSelectedCategory={(value) => {
+          sessionStorage.removeItem(CACHE_KEY);
+          sessionStorage.removeItem(SCROLL_KEY);
+          sessionStorage.removeItem(VISIBLE_KEY);
+
+          setVisibleCount(15);
+          setSelectedCategory(value);
+        }}
       />
 
       <Masonry
+        key={`${selectedCategory}-${images.length}-${ads.length}`}
         breakpointCols={breakpointColumnsObj}
         className="masonry-grid"
         columnClassName="masonry-column"
@@ -163,33 +212,22 @@ function ImagesPage() {
         {feedItems.map((item, index) => {
           if (item.type === "ad") {
             return (
-              <div key={`ad-${index}`} className="feed-ad">
+              <div key={`ad-${item.data._id}`} className="feed-ad">
                 <AdCard ad={item.data} />
               </div>
             );
           }
 
-          return (
-            <ImageCard
-              key={item.data._id}
-              item={item.data}
-              setSelectedItem={setSelectedItem}
-            />
-          );
+          return <ImageCard key={item.data._id} item={item.data} />;
         })}
       </Masonry>
 
       {visibleCount < images.length && (
-        <div ref={loadMoreRef} className="load-more-trigger">
+        <div ref={loadMoreRef}>
           <Loader />
         </div>
       )}
 
-      <MediaModal
-        item={selectedItem}
-        closeModal={() => setSelectedItem(null)}
-        setSelectedItem={setSelectedItem}
-      />
       <Footer />
     </>
   );

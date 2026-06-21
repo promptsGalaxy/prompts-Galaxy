@@ -3,13 +3,10 @@ import { NavLink } from "react-router-dom";
 import { House, Images, Clapperboard, Search } from "lucide-react";
 
 import SearchOverlay from "./SearchOverlay";
-import MediaModal from "./MediaModal";
 import "../styles/Navbar.css";
 
 function Navbar() {
   const [showSearch, setShowSearch] = useState(false);
-
-  const [selectedMedia, setSelectedMedia] = useState(null);
 
   return (
     <>
@@ -45,19 +42,7 @@ function Navbar() {
         </ul>
       </nav>
 
-      {showSearch && (
-        <SearchOverlay
-          close={() => setShowSearch(false)}
-          openMedia={setSelectedMedia}
-        />
-      )}
-
-      {selectedMedia && (
-        <MediaModal
-          item={selectedMedia}
-          closeModal={() => setSelectedMedia(null)}
-        />
-      )}
+      {showSearch && <SearchOverlay close={() => setShowSearch(false)} />}
     </>
   );
 }

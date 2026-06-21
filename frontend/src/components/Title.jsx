@@ -1,14 +1,14 @@
-import React from "react";
+import { Link } from "react-router-dom";
 import "../styles/Logo.css";
 
 const Title = () => {
   return (
-    <a href="/" className="logo">
+    <Link to="/" className="logo">
       <div className="logo-text">
         <h1>MVR</h1>
         <p>PROMPTS</p>
       </div>
-    </a>
+    </Link>
   );
 };
 

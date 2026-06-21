@@ -5,6 +5,7 @@ import VideosPage from "./pages/VideosPage";
 import "./App.css";
 import HomePage from "./pages/HomePage";
 import SearchResultsPage from "./pages/SearchResultsPage";
+import PromptDetails from "./pages/PromptDetails";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="/images" element={<ImagesPage />} />
         <Route path="/videos" element={<VideosPage />} />
         <Route path="/search" element={<SearchResultsPage />} />
+        <Route path="/prompt/:slug" element={<PromptDetails />} />
       </Routes>
     </BrowserRouter>
   );

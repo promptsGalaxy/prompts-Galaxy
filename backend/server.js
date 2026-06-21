@@ -9,6 +9,7 @@ const Ad = require("./Ad");
 const Click = require("./Click");
 
 const app = express();
+const { SitemapStream, streamToPromise } = require("sitemap");
 
 connectDB();
 
@@ -25,6 +26,35 @@ app.use(
 );
 app.use(express.json());
 
+function createSlug(text = "") {
+  return text
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-");
+}
+async function generateSlug(text, currentId = null) {
+  const baseSlug = createSlug(text);
+
+  let slug = baseSlug;
+  let counter = 1;
+
+  while (true) {
+    const existing = await Prompt.findOne({ slug }).select("_id");
+
+    if (!existing) break;
+
+    if (currentId && existing._id.toString() === currentId) {
+      break;
+    }
+
+    slug = `${baseSlug}-${counter}`;
+    counter++;
+  }
+
+  return slug;
+}
 /* =========================
    GET PROMPTS
 ========================= */
@@ -119,8 +149,50 @@ app.get("/api/search", async (req, res) => {
 });
 
 /* =========================
+   GET SINGLE PROMPT
+========================= */
+app.get("/api/prompts/:id", async (req, res) => {
+  try {
+    const prompt = await Prompt.findById(req.params.id);
+
+    if (!prompt) {
+      return res.status(404).json({
+        message: "Prompt not found",
+      });
+    }
+
+    res.json(prompt);
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+    });
+  }
+});
+
+app.get("/api/prompts/slug/:slug", async (req, res) => {
+  try {
+    const prompt = await Prompt.findOne({
+      slug: req.params.slug,
+    });
+
+    if (!prompt) {
+      return res.status(404).json({
+        message: "Prompt not found",
+      });
+    }
+
+    res.json(prompt);
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+    });
+  }
+});
+
+/* =========================
    INCREASE PROMPT VIEW
 ========================= */
+
 app.post("/api/prompts/:id/view", async (req, res) => {
   try {
     const prompt = await Prompt.findByIdAndUpdate(
@@ -213,6 +285,8 @@ app.get("/api/ads", async (req, res) => {
 
 app.post("/api/prompts", async (req, res) => {
   try {
+    req.body.slug = await generateSlug(req.body.Prompt);
+
     const prompt = await Prompt.create(req.body);
 
     res.status(201).json(prompt);
@@ -225,6 +299,8 @@ app.post("/api/prompts", async (req, res) => {
 
 app.put("/api/prompts/:id", async (req, res) => {
   try {
+    req.body.slug = await generateSlug(req.body.Prompt, req.params.id);
+
     const updatedPrompt = await Prompt.findByIdAndUpdate(
       req.params.id,
       req.body,
@@ -242,7 +318,9 @@ app.put("/api/prompts/:id", async (req, res) => {
 
     res.json(updatedPrompt);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      message: err.message,
+    });
   }
 });
 
@@ -304,6 +382,50 @@ app.post("/api/ads/:id/click", async (req, res) => {
     res.status(500).json({
       message: err.message,
     });
+  }
+});
+
+app.get("/sitemap.xml", async (req, res) => {
+  try {
+    const smStream = new SitemapStream({
+      hostname: "https://mvrprompts.com",
+    });
+
+    smStream.write({
+      url: "/",
+      changefreq: "daily",
+      priority: 1.0,
+    });
+
+    smStream.write({
+      url: "/images",
+    });
+
+    smStream.write({
+      url: "/videos",
+    });
+
+    const prompts = await Prompt.find({}, "slug updatedAt");
+
+    prompts.forEach((prompt) => {
+      if (prompt.slug) {
+        smStream.write({
+          url: `/prompt/${prompt.slug}`,
+          lastmod: prompt.updatedAt,
+          changefreq: "weekly",
+          priority: 0.8,
+        });
+      }
+    });
+
+    smStream.end();
+
+    const sitemap = await streamToPromise(smStream);
+
+    res.header("Content-Type", "application/xml");
+    res.send(sitemap.toString());
+  } catch (err) {
+    res.status(500).send(err.message);
   }
 });
 

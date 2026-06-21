@@ -2,18 +2,19 @@ import { Fragment, useEffect, useRef, useState } from "react";
 import API from "../api";
 import { Helmet } from "react-helmet-async";
 import CategoryFilter from "../components/CategoryFilter";
-import MediaModal from "../components/MediaModal";
 import AdCard from "../components/AdCard";
 import Loader from "../components/Loader";
 
 import "../styles/Reels.css";
 import Title from "../components/Title";
+import { useNavigate } from "react-router-dom";
+import Footer from "../components/Footer";
 
 function VideosPage() {
+  const navigate = useNavigate();
   const [videos, setVideos] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const [selectedItem, setSelectedItem] = useState(null);
   const [muted, setMuted] = useState(true);
   const [ads, setAds] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -143,7 +144,7 @@ function VideosPage() {
                   </button>
                   <button
                     className="prompt-btn"
-                    onClick={() => setSelectedItem(item)}
+                    onClick={() => navigate(`/prompt/${item.slug}`)}
                   >
                     View Prompt
                   </button>
@@ -161,12 +162,8 @@ function VideosPage() {
             )}
           </Fragment>
         ))}
+        <Footer />
       </div>
-
-      <MediaModal
-        item={selectedItem}
-        closeModal={() => setSelectedItem(null)}
-      />
     </>
   );
 }

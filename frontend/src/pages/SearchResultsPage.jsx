@@ -4,11 +4,11 @@ import API from "../api";
 import { Helmet } from "react-helmet-async";
 import ImageCard from "../components/ImageCard";
 import VideoCard from "../components/VideoCard";
-import MediaModal from "../components/MediaModal";
+import Title from "../components/Title";
+import Footer from "../components/Footer";
 
 function SearchResultsPage() {
   const [posts, setPosts] = useState([]);
-  const [selectedItem, setSelectedItem] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const [searchParams] = useSearchParams();
@@ -57,6 +57,7 @@ function SearchResultsPage() {
         />
       </Helmet>
       <Title />
+
       <h2 className="search-title">Search Results: {query}</h2>
 
       {loading && <p>Loading...</p>}
@@ -66,26 +67,13 @@ function SearchResultsPage() {
       <div className="grid">
         {posts.map((item) =>
           item.mediaType === "image" ? (
-            <ImageCard
-              key={item._id}
-              item={item}
-              setSelectedItem={setSelectedItem}
-            />
+            <ImageCard key={item._id} item={item} />
           ) : (
-            <VideoCard
-              key={item._id}
-              item={item}
-              setSelectedItem={setSelectedItem}
-            />
+            <VideoCard key={item._id} item={item} />
           ),
         )}
       </div>
-
-      <MediaModal
-        item={selectedItem}
-        closeModal={() => setSelectedItem(null)}
-        setSelectedItem={setSelectedItem}
-      />
+      <Footer />
     </>
   );
 }
