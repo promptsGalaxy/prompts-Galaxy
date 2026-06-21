@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import API from "../api";
 import Masonry from "react-masonry-css";
+import { Helmet } from "react-helmet-async";
 
 import MediaModal from "../components/MediaModal";
 import AdCard from "../components/AdCard";
@@ -104,6 +105,19 @@ function HomePage() {
 
   return (
     <>
+      <Helmet>
+        <title>MVR Prompts | Free AI Image & Video Prompts</title>
+
+        <meta
+          name="description"
+          content="Discover thousands of free AI image and video prompts for ChatGPT, Midjourney, Flux, Gemini, Kling, Veo, Runway and more. Copy premium prompts instantly on MVR Prompts."
+        />
+
+        <meta
+          name="keywords"
+          content="AI prompts, image prompts, video prompts, ChatGPT prompts, Midjourney prompts, Flux prompts, Kling prompts, Veo prompts, MVR Prompts"
+        />
+      </Helmet>
       <Title />
       <br />
       <Masonry

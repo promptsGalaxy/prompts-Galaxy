@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import API from "../api";
 import Masonry from "react-masonry-css";
+import { Helmet } from "react-helmet-async";
 
 import CategoryFilter from "../components/CategoryFilter";
 import ImageCard from "../components/ImageCard";
@@ -133,6 +134,20 @@ function ImagesPage() {
 
   return (
     <>
+      <Helmet>
+        <title>AI Image Prompts | MVR Prompts</title>
+
+        <meta
+          name="description"
+          content="Browse premium AI image prompts for realistic portraits, fashion, cinematic scenes, couples, kids, fantasy, product photography and more."
+        />
+
+        <meta
+          name="keywords"
+          content="AI image prompts, Midjourney prompts, Flux prompts, realistic prompts, portrait prompts, image generation prompts"
+        />
+      </Helmet>
+
       <Title />
       <CategoryFilter
         categories={categories}

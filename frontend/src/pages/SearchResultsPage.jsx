@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import API from "../api";
-
+import { Helmet } from "react-helmet-async";
 import ImageCard from "../components/ImageCard";
 import VideoCard from "../components/VideoCard";
 import MediaModal from "../components/MediaModal";
@@ -43,6 +43,19 @@ function SearchResultsPage() {
 
   return (
     <>
+      <Helmet>
+        <title>Search AI Prompts | MVR Prompts</title>
+
+        <meta
+          name="description"
+          content="Search thousands of AI image and video prompts by keyword, category or style. Find the perfect prompt instantly with MVR Prompts."
+        />
+
+        <meta
+          name="keywords"
+          content="search AI prompts, prompt search, image prompts, video prompts, MVR Prompts"
+        />
+      </Helmet>
       <Title />
       <h2 className="search-title">Search Results: {query}</h2>
 

@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useRef, useState } from "react";
 import API from "../api";
-
+import { Helmet } from "react-helmet-async";
 import CategoryFilter from "../components/CategoryFilter";
 import MediaModal from "../components/MediaModal";
 import AdCard from "../components/AdCard";
@@ -99,6 +99,20 @@ function VideosPage() {
 
   return (
     <>
+      <Helmet>
+        <title>AI Video Prompts | MVR Prompts</title>
+
+        <meta
+          name="description"
+          content="Explore professional AI video prompts for Veo, Kling, Runway, Pika and other AI video generators. Create stunning cinematic videos effortlessly."
+        />
+
+        <meta
+          name="keywords"
+          content="AI video prompts, Veo prompts, Kling prompts, Runway prompts, cinematic video prompts, AI animation prompts"
+        />
+      </Helmet>
+
       <Title />
       <div className="reels-categories">
         <CategoryFilter
