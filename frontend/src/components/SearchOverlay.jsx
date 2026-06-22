@@ -36,10 +36,17 @@ function SearchOverlay({ close }) {
       <div className="search-header">
         <input
           autoFocus
-          type="text"
+          type="search"
           placeholder="Search prompts..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
+          enterKeyHint="search"
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              e.currentTarget.blur(); // Keyboard hide
+            }
+          }}
         />
 
         <button onClick={close}>✕</button>
