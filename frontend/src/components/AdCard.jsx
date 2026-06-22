@@ -51,6 +51,7 @@ function AdCard({ ad }) {
           src={ad.imageUrl}
           alt={ad.title}
           loading="lazy"
+          onLoad={() => window.dispatchEvent(new Event("resize"))}
         />
       </div>
 
