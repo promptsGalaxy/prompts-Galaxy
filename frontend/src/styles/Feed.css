@@ -51,6 +51,21 @@
 
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
 }
+.feed-card-categories {
+  position: absolute;
+  bottom: 20px;
+  left: 12px;
+
+  padding: 6px 12px;
+
+  color: #fff;
+  background: rgba(0, 0, 0, 0.5);
+
+  border-radius: 999px;
+
+  font-size: 12px;
+  font-weight: 600;
+}
 
 /* =========================
    IMAGE LOADING FIX
