@@ -12,6 +12,9 @@ function ImageCard({ item }) {
         decoding="async"
         onLoad={() => window.dispatchEvent(new Event("resize"))}
       />
+      <div className="feed-card-categories">
+        <p>{item.Category}</p>
+      </div>
 
       <div className="feed-card-btn">
         <button className="view-btn">View Prompt</button>

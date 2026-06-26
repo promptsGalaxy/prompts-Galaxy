@@ -249,6 +249,9 @@ function PromptDetails() {
             }}
           />
         )}
+        <div className="feed-card-categories">
+          <p>{prompt.Category}</p>
+        </div>
         <div
           style={{
             display: "flex",
