@@ -249,9 +249,7 @@ function PromptDetails() {
             }}
           />
         )}
-        <div className="feed-card-categories">
-          <p>{prompt.Category}</p>
-        </div>
+
         <div
           style={{
             display: "flex",
@@ -290,6 +288,9 @@ function PromptDetails() {
             <Download size={18} />
             Download Image
           </button>
+        </div>
+        <div className="detail-categories">
+          <p>{prompt.Category}</p>
         </div>
         <div
           style={{
