@@ -63,7 +63,6 @@ app.get("/api/prompts", async (req, res) => {
     const { mediaType, category, search } = req.query;
 
     const query = {};
-
     if (mediaType) {
       query.mediaType = mediaType;
     }

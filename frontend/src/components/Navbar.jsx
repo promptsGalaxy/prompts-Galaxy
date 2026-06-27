@@ -13,13 +13,6 @@ function Navbar() {
       <nav className="navbar">
         <ul className="nav-links">
           <li>
-            <NavLink to="/" end>
-              <House size={22} />
-              <span>Home</span>
-            </NavLink>
-          </li>
-
-          <li>
             <button className="search-btn" onClick={() => setShowSearch(true)}>
               <Search size={22} />
               <span>Search</span>
@@ -27,7 +20,7 @@ function Navbar() {
           </li>
 
           <li>
-            <NavLink to="/images">
+            <NavLink to="/">
               <Images size={22} />
               <span>Images</span>
             </NavLink>

@@ -9,6 +9,7 @@ import "../styles/Reels.css";
 import Title from "../components/Title";
 import { useNavigate } from "react-router-dom";
 import Footer from "../components/Footer";
+import NoVideos from "../components/NoVideos";
 
 function VideosPage() {
   const navigate = useNavigate();
@@ -162,6 +163,8 @@ function VideosPage() {
             )}
           </Fragment>
         ))}
+        {videos.length === 0 && <NoVideos />}
+
         <Footer />
       </div>
     </>

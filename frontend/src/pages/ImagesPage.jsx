@@ -212,13 +212,17 @@ function ImagesPage() {
         {feedItems.map((item, index) => {
           if (item.type === "ad") {
             return (
-              <div key={`ad-${item.data._id}`} className="feed-ad">
+              <div key={`ad-${item.data._id}-${index}`} className="feed-ad">
                 <AdCard ad={item.data} />
               </div>
             );
           }
-
-          return <ImageCard key={item.data._id} item={item.data} />;
+          return (
+            <ImageCard
+              key={`image-${item.data._id}-${index}`}
+              item={item.data}
+            />
+          );
         })}
       </Masonry>
 
