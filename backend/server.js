@@ -27,12 +27,17 @@ app.use(
 app.use(express.json());
 
 function createSlug(text = "") {
-  return text
+  const words = text
     .toLowerCase()
     .replace(/[^\w\s-]/g, "")
     .trim()
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-");
+    .split(/\s+/)
+    .slice(0, 8) // First 8 words only
+    .join("-");
+
+  const random = Math.random().toString(36).substring(2, 8);
+
+  return `${words}-${random}`;
 }
 async function generateSlug(text, currentId = null) {
   const baseSlug = createSlug(text);
