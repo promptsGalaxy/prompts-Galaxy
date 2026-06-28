@@ -82,8 +82,8 @@ function PromptDetails() {
 
       if (navigator.share) {
         await navigator.share({
-          title: prompt.Prompt,
-          text: prompt.Prompt,
+          title: "MVR Prompts",
+          text: "Check out this AI prompt on MVR Prompts",
           url,
         });
       } else {
