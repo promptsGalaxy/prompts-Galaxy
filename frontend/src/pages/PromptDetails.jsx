@@ -397,6 +397,9 @@ function PromptDetails() {
           >
             Click Here
           </button>
+          <br />
+          <br />
+          <br />
         </div>
       </div>
     </>
