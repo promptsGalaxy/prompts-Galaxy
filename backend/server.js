@@ -7,6 +7,7 @@ const connectDB = require("./config/db");
 const Prompt = require("./Prompt");
 const Ad = require("./Ad");
 const Click = require("./Click");
+const sendTelegramPost = require("./telegram");
 
 const app = express();
 const { SitemapStream, streamToPromise } = require("sitemap");
@@ -292,6 +293,13 @@ app.post("/api/prompts", async (req, res) => {
     req.body.slug = await generateSlug(req.body.Prompt);
 
     const prompt = await Prompt.create(req.body);
+
+    // Telegram Upload
+    try {
+      await sendTelegramPost(prompt);
+    } catch (e) {
+      console.log("Telegram Error:", e.message);
+    }
 
     res.status(201).json(prompt);
   } catch (err) {
