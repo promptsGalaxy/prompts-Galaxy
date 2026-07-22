@@ -301,23 +301,6 @@ function PromptDetails() {
           }}
         >
           <h2>Prompt</h2>
-
-          <button
-            className="copy-btn"
-            onClick={() => copyPrompt(prompt.Prompt, 1)}
-          >
-            {copiedPrompt1 ? (
-              <>
-                <Check size={18} />
-                <span>Copied</span>
-              </>
-            ) : (
-              <>
-                <Copy size={18} />
-                <span>Copy Prompt</span>
-              </>
-            )}
-          </button>
         </div>
 
         <div
@@ -331,6 +314,22 @@ function PromptDetails() {
         >
           {prompt.Prompt}
         </div>
+        <button
+          className="copy-btn"
+          onClick={() => copyPrompt(prompt.Prompt, 1)}
+        >
+          {copiedPrompt1 ? (
+            <>
+              <Check size={18} />
+              <span>Copied</span>
+            </>
+          ) : (
+            <>
+              <Copy size={18} />
+              <span>Copy Prompt</span>
+            </>
+          )}
+        </button>
 
         {prompt.description && (
           <>
