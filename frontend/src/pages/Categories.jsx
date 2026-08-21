@@ -5,6 +5,28 @@ import "../styles/Categories.css";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
+/* =========================================================
+   NORMALIZE SLUG
+   ---------------------------------------------------------
+   This makes these values equivalent:
+
+   RakshaBandhan
+   raksha-bandhan
+   raksha_bandhan
+   rakshabandhan
+   RAKSHA-BANDHAN
+========================================================= */
+
+const normalizeSlug = (value) => {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
+};
+
+/* =========================================================
+   CATEGORY ICONS
+========================================================= */
+
 const categoryIcons = {
   men: "👨",
   women: "👩",
@@ -15,20 +37,109 @@ const categoryIcons = {
   family: "👨‍👩‍👧",
   group: "👥",
   others: "🔥",
-  RakshaBandhan: "🪢",
+
+  // Normalized key
+  rakshabandhan: "🪢",
 };
+
+/* =========================================================
+   CATEGORY DESCRIPTIONS
+========================================================= */
 
 const categoryDescriptions = {
   men: "Creative AI image and video prompts for men",
+
   women: "Stylish and creative AI prompts for women",
+
   couple: "Romantic and beautiful couple AI prompts",
+
   kid: "Cute and creative AI prompts for kids",
+
   kids: "Cute and creative AI prompts for kids",
+
   editing: "AI photo editing and enhancement prompts",
+
   family: "Beautiful family portrait AI prompts",
+
   group: "Creative group photography AI prompts",
+
   others: "More creative and trending AI prompts",
+
+  // Normalized key
+  rakshabandhan: "Creative Raksha Bandhan AI image prompts",
 };
+
+/* =========================================================
+   CATEGORY SECTIONS
+   ---------------------------------------------------------
+   Change ONLY this array to control:
+
+   1. Section order
+   2. Category order
+   3. Which category belongs to which section
+========================================================= */
+
+const CATEGORY_SECTIONS = [
+  {
+    id: "festivals",
+    title: "Festivals & Occasions",
+    description: "Creative AI prompts for festivals and special occasions",
+
+    categories: ["raksha-bandhan"],
+  },
+
+  {
+    id: "people",
+    title: "People",
+    description: "Explore creative AI prompts for individuals",
+
+    categories: ["men", "women"],
+  },
+
+  {
+    id: "relationships",
+    title: "Relationships & Family",
+    description: "Beautiful prompts for couples and families",
+
+    categories: ["couple", "family"],
+  },
+
+  {
+    id: "kids",
+    title: "Kids",
+    description: "Cute and creative AI prompts for kids",
+
+    categories: ["kid"],
+  },
+
+  {
+    id: "editing",
+    title: "Photo Editing",
+    description: "Enhance, transform and edit your photos with AI",
+
+    categories: ["editing"],
+  },
+
+  {
+    id: "groups",
+    title: "Groups",
+    description: "Creative AI prompts for group photography",
+
+    categories: ["group"],
+  },
+
+  {
+    id: "others",
+    title: "More Categories",
+    description: "More creative and trending AI prompts",
+
+    categories: ["others"],
+  },
+];
+
+/* =========================================================
+   COMPONENT
+========================================================= */
 
 export default function Categories() {
   const [categories, setCategories] = useState([]);
@@ -38,6 +149,10 @@ export default function Categories() {
   const [loading, setLoading] = useState(true);
 
   const [error, setError] = useState("");
+
+  /* =========================================================
+     FETCH CATEGORIES
+  ========================================================= */
 
   useEffect(() => {
     fetchCategories();
@@ -57,6 +172,8 @@ export default function Categories() {
 
       const data = await response.json();
 
+      console.log("Categories API Response:", data);
+
       setCategories(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Categories Error:", err);
@@ -67,6 +184,10 @@ export default function Categories() {
     }
   };
 
+  /* =========================================================
+     SEARCH
+  ========================================================= */
+
   const filteredCategories = categories.filter((category) => {
     const text = search.toLowerCase().trim();
 
@@ -75,14 +196,42 @@ export default function Categories() {
     }
 
     return (
-      category.name.toLowerCase().includes(text) ||
-      category.slug.toLowerCase().includes(text)
+      category.name?.toLowerCase().includes(text) ||
+      category.slug?.toLowerCase().includes(text)
     );
   });
 
+  /* =========================================================
+     GET CATEGORY BY SLUG
+     ---------------------------------------------------------
+     Uses normalizeSlug() so slug format doesn't matter.
+========================================================= */
+
+  const getCategory = (slug) => {
+    const normalizedSlug = normalizeSlug(slug);
+
+    return filteredCategories.find(
+      (category) => normalizeSlug(category.slug) === normalizedSlug,
+    );
+  };
+
+  /* =========================================================
+     GET SECTION CATEGORIES
+========================================================= */
+
+  const getSectionCategories = (section) => {
+    return section.categories.map((slug) => getCategory(slug)).filter(Boolean);
+  };
+
+  /* =========================================================
+     RETURN
+========================================================= */
+
   return (
     <main className="categories-page">
-      {/* HERO */}
+      {/* =====================================================
+          HERO
+      ===================================================== */}
 
       <section className="categories-hero">
         <div className="categories-hero-inner">
@@ -108,7 +257,11 @@ export default function Categories() {
             />
 
             {search && (
-              <button type="button" onClick={() => setSearch("")}>
+              <button
+                type="button"
+                onClick={() => setSearch("")}
+                aria-label="Clear search"
+              >
                 ×
               </button>
             )}
@@ -116,18 +269,14 @@ export default function Categories() {
         </div>
       </section>
 
-      {/* CONTENT */}
+      {/* =====================================================
+          CONTENT
+      ===================================================== */}
 
       <section className="categories-container">
-        <div className="categories-heading">
-          <div>
-            <h2>All Categories</h2>
-
-            {!loading && <p>{categories.length} categories available</p>}
-          </div>
-        </div>
-
-        {/* LOADING */}
+        {/* ===================================================
+            LOADING
+        =================================================== */}
 
         {loading && (
           <div className="categories-loading">
@@ -137,7 +286,9 @@ export default function Categories() {
           </div>
         )}
 
-        {/* ERROR */}
+        {/* ===================================================
+            ERROR
+        =================================================== */}
 
         {!loading && error && (
           <div className="categories-error">
@@ -151,7 +302,9 @@ export default function Categories() {
           </div>
         )}
 
-        {/* NO RESULTS */}
+        {/* ===================================================
+            NO RESULTS
+        =================================================== */}
 
         {!loading && !error && filteredCategories.length === 0 && (
           <div className="categories-empty">
@@ -163,39 +316,93 @@ export default function Categories() {
           </div>
         )}
 
-        {/* CATEGORY GRID */}
+        {/* ===================================================
+            SECTION-WISE CATEGORY DISPLAY
+        =================================================== */}
 
         {!loading && !error && filteredCategories.length > 0 && (
-          <div className="categories-grid">
-            {filteredCategories.map((category) => {
-              const icon = categoryIcons[category.slug] || "✨";
+          <div className="categories-sections">
+            {CATEGORY_SECTIONS.map((section) => {
+              const sectionCategories = getSectionCategories(section);
 
-              const description =
-                categoryDescriptions[category.slug] ||
-                `Explore ${category.name} AI prompts`;
+              /*
+                  If this section has no matching
+                  categories, don't display it.
+                */
+
+              if (sectionCategories.length === 0) {
+                return null;
+              }
 
               return (
-                <Link
-                  key={category.slug}
-                  to={`/categories/${category.slug}`}
-                  className="category-card"
-                >
-                  <div className="category-card-top">
-                    <div className="category-icon">{icon}</div>
+                <section key={section.id} className="category-section">
+                  {/* =====================================
+                        SECTION HEADER
+                    ===================================== */}
 
-                    <span className="category-count">{category.count}</span>
+                  <div className="category-section-header">
+                    <div>
+                      <h2>{section.title}</h2>
+
+                      <p>{section.description}</p>
+                    </div>
                   </div>
 
-                  <h3>{category.name}</h3>
+                  {/* =====================================
+                        CATEGORY GRID
+                    ===================================== */}
 
-                  <p>{description}</p>
+                  <div className="categories-grid">
+                    {sectionCategories.map((category) => {
+                      /*
+                            Normalize the actual
+                            backend slug.
+                          */
 
-                  <div className="category-explore">
-                    <span>Explore Prompts</span>
+                      const categoryKey = normalizeSlug(category.slug);
 
-                    <span className="category-arrow">→</span>
+                      const icon = categoryIcons[categoryKey] || "✨";
+
+                      const description =
+                        categoryDescriptions[categoryKey] ||
+                        `Explore ${category.name} AI prompts`;
+
+                      return (
+                        <Link
+                          key={category.slug}
+                          to={`/categories/${category.slug}`}
+                          className="category-card"
+                        >
+                          {/* TOP */}
+
+                          <div className="category-card-top">
+                            <div className="category-icon">{icon}</div>
+
+                            <span className="category-count">
+                              {category.count ?? 0}
+                            </span>
+                          </div>
+
+                          {/* TITLE */}
+
+                          <h3>{category.name}</h3>
+
+                          {/* DESCRIPTION */}
+
+                          <p>{description}</p>
+
+                          {/* EXPLORE */}
+
+                          <div className="category-explore">
+                            <span>Explore Prompts</span>
+
+                            <span className="category-arrow">→</span>
+                          </div>
+                        </Link>
+                      );
+                    })}
                   </div>
-                </Link>
+                </section>
               );
             })}
           </div>

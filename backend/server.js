@@ -666,7 +666,13 @@ app.get("/sitemap.xml", async (req, res) => {
     res.status(500).send(err.message);
   }
 });
-
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "ok",
+    message: "MVR Prompts API is running",
+    timestamp: new Date().toISOString(),
+  });
+});
 /* =========================
    SERVER
 ========================= */
