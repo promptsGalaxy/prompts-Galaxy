@@ -3,7 +3,6 @@ import API from "../api";
 import Masonry from "react-masonry-css";
 import { Helmet } from "react-helmet-async";
 
-import CategoryFilter from "../components/CategoryFilter";
 import ImageCard from "../components/ImageCard";
 import AdCard from "../components/AdCard";
 import Loader from "../components/Loader";
@@ -21,12 +20,7 @@ function ImagesPage() {
 
   const [images, setImages] = useState(cache ? JSON.parse(cache).images : []);
 
-  const [categories, setCategories] = useState([]);
   const [ads, setAds] = useState([]);
-
-  const [selectedCategory, setSelectedCategory] = useState(
-    cache ? JSON.parse(cache).category : "all",
-  );
 
   const [loading, setLoading] = useState(!cache);
 
@@ -45,19 +39,20 @@ function ImagesPage() {
     500: 1,
   };
 
+  // Fetch Ads
   useEffect(() => {
-    fetchCategories();
     fetchAds();
   }, []);
 
+  // Fetch Images
   useEffect(() => {
     const cached = sessionStorage.getItem(CACHE_KEY);
 
     if (cached) {
-      const data = JSON.parse(cached);
+      try {
+        const data = JSON.parse(cached);
 
-      if (data.category === selectedCategory) {
-        setImages(data.images);
+        setImages(data.images || []);
         setLoading(false);
 
         setTimeout(() => {
@@ -69,11 +64,14 @@ function ImagesPage() {
         }, 100);
 
         return;
+      } catch (err) {
+        console.log("Cache parse error:", err);
+        sessionStorage.removeItem(CACHE_KEY);
       }
     }
 
     fetchImages();
-  }, [selectedCategory]);
+  }, []);
 
   const fetchImages = async () => {
     try {
@@ -82,7 +80,6 @@ function ImagesPage() {
       const res = await API.get("/api/prompts", {
         params: {
           mediaType: "image",
-          category: selectedCategory,
         },
       });
 
@@ -91,12 +88,11 @@ function ImagesPage() {
       sessionStorage.setItem(
         CACHE_KEY,
         JSON.stringify({
-          category: selectedCategory,
           images: res.data,
         }),
       );
     } catch (err) {
-      console.log(err);
+      console.log("Error fetching images:", err);
     } finally {
       setLoading(false);
 
@@ -110,26 +106,22 @@ function ImagesPage() {
     }
   };
 
-  const fetchCategories = async () => {
-    try {
-      const res = await API.get("/api/categories");
-      setCategories(res.data);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
+  // Fetch Ads
   const fetchAds = async () => {
     try {
       const res = await API.get("/api/ads");
       setAds(res.data);
-    } catch (err) {}
+    } catch (err) {
+      console.log("Error fetching ads:", err);
+    }
   };
 
+  // Save visible count
   useEffect(() => {
     sessionStorage.setItem(VISIBLE_KEY, visibleCount);
   }, [visibleCount]);
 
+  // Save scroll position
   useEffect(() => {
     const saveScroll = () => {
       sessionStorage.setItem(SCROLL_KEY, window.scrollY);
@@ -142,6 +134,7 @@ function ImagesPage() {
     };
   }, []);
 
+  // Infinite scroll
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -162,10 +155,13 @@ function ImagesPage() {
     return () => observer.disconnect();
   }, [visibleCount, images.length]);
 
-  if (loading) return <Loader />;
+  if (loading) {
+    return <Loader />;
+  }
 
   const visibleImages = images.slice(0, visibleCount);
 
+  // Create feed with ads after every 6 images
   const feedItems = [];
 
   visibleImages.forEach((image, index) => {
@@ -190,21 +186,8 @@ function ImagesPage() {
 
       <Title />
 
-      <CategoryFilter
-        categories={categories}
-        selectedCategory={selectedCategory}
-        setSelectedCategory={(value) => {
-          sessionStorage.removeItem(CACHE_KEY);
-          sessionStorage.removeItem(SCROLL_KEY);
-          sessionStorage.removeItem(VISIBLE_KEY);
-
-          setVisibleCount(15);
-          setSelectedCategory(value);
-        }}
-      />
-
       <Masonry
-        key={`${selectedCategory}-${images.length}-${ads.length}`}
+        key={`${images.length}-${ads.length}`}
         breakpointCols={breakpointColumnsObj}
         className="masonry-grid"
         columnClassName="masonry-column"
@@ -217,6 +200,7 @@ function ImagesPage() {
               </div>
             );
           }
+
           return (
             <ImageCard
               key={`image-${item.data._id}-${index}`}

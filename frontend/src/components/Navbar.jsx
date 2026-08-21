@@ -25,6 +25,12 @@ function Navbar() {
               <span>Images</span>
             </NavLink>
           </li>
+          <li>
+            <NavLink to="/categories">
+              <House size={22} />
+              <span>Categories</span>
+            </NavLink>
+          </li>
 
           <li>
             <NavLink to="/videos">

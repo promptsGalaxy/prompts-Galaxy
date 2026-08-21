@@ -10,9 +10,14 @@ const Click = require("./Click");
 const sendTelegramPost = require("./telegram");
 
 const app = express();
+
 const { SitemapStream, streamToPromise } = require("sitemap");
 
 connectDB();
+
+/* =========================
+   CORS
+========================= */
 
 app.use(
   cors({
@@ -25,7 +30,12 @@ app.use(
     ],
   }),
 );
+
 app.use(express.json());
+
+/* =========================
+   SLUG FUNCTIONS
+========================= */
 
 function createSlug(text = "") {
   const words = text
@@ -33,13 +43,14 @@ function createSlug(text = "") {
     .replace(/[^\w\s-]/g, "")
     .trim()
     .split(/\s+/)
-    .slice(0, 8) // First 8 words only
+    .slice(0, 8)
     .join("-");
 
   const random = Math.random().toString(36).substring(2, 8);
 
   return `${words}-${random}`;
 }
+
 async function generateSlug(text, currentId = null) {
   const baseSlug = createSlug(text);
 
@@ -47,7 +58,9 @@ async function generateSlug(text, currentId = null) {
   let counter = 1;
 
   while (true) {
-    const existing = await Prompt.findOne({ slug }).select("_id");
+    const existing = await Prompt.findOne({
+      slug,
+    }).select("_id");
 
     if (!existing) break;
 
@@ -56,24 +69,28 @@ async function generateSlug(text, currentId = null) {
     }
 
     slug = `${baseSlug}-${counter}`;
+
     counter++;
   }
 
   return slug;
 }
+
 /* =========================
    GET PROMPTS
 ========================= */
+
 app.get("/api/prompts", async (req, res) => {
   try {
     const { mediaType, category, search } = req.query;
 
     const query = {};
+
     if (mediaType) {
       query.mediaType = mediaType;
     }
 
-    if (category && category !== "all") {
+    if (category && category.toLowerCase() !== "all") {
       query.Category = category;
     }
 
@@ -85,17 +102,30 @@ app.get("/api/prompts", async (req, res) => {
     }
 
     const data = await Prompt.aggregate([
-      { $match: query },
-      { $sample: { size: 100 } },
+      {
+        $match: query,
+      },
+      {
+        $sample: {
+          size: 100,
+        },
+      },
     ]);
 
     res.json(data);
   } catch (err) {
+    console.error("GET PROMPTS ERROR:", err);
+
     res.status(500).json({
       message: err.message,
     });
   }
 });
+
+/* =========================
+   CLICK
+========================= */
+
 app.get("/api/click", async (req, res) => {
   try {
     const post = await Click.findOne();
@@ -107,28 +137,151 @@ app.get("/api/click", async (req, res) => {
     });
   }
 });
-
 /* =========================
    GET CATEGORIES
+   Category is stored as ARRAY
+
+   Example:
+   Category: ["men", "couple"]
 ========================= */
+
 app.get("/api/categories", async (req, res) => {
   try {
-    res.json([
-      "men",
-      "women",
-      "couple",
-      "kid",
-      "editing",
-      "family",
-      "group",
-      "others",
+    const categories = await Prompt.aggregate([
+      {
+        $match: {
+          Category: {
+            $exists: true,
+            $type: "array",
+            $ne: [],
+          },
+        },
+      },
+
+      // Array ni individual categories ga split chestundi
+      {
+        $unwind: "$Category",
+      },
+
+      // Empty values remove
+      {
+        $match: {
+          Category: {
+            $exists: true,
+            $nin: ["", null],
+          },
+        },
+      },
+
+      // Same category count
+      {
+        $group: {
+          _id: {
+            $toLower: {
+              $trim: {
+                input: "$Category",
+              },
+            },
+          },
+          name: {
+            $first: "$Category",
+          },
+          count: {
+            $sum: 1,
+          },
+        },
+      },
+
+      // Highest count first
+      {
+        $sort: {
+          count: -1,
+        },
+      },
     ]);
+
+    const result = categories.map((item) => ({
+      name: item.name.trim(),
+
+      count: item.count,
+
+      slug: item.name
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, ""),
+    }));
+
+    res.status(200).json(result);
   } catch (err) {
+    console.error("❌ GET CATEGORIES ERROR:", err);
+
     res.status(500).json({
-      message: err.message,
+      message: "Failed to load categories",
+      error: err.message,
     });
   }
 });
+
+/* =====================================================
+   GET PROMPTS BY CATEGORY
+
+   Example:
+   /api/prompts/category/men
+   /api/prompts/category/women?page=2&limit=24
+===================================================== */
+
+app.get("/api/prompts/category/:category", async (req, res) => {
+  try {
+    const { category } = req.params;
+
+    const page = Math.max(parseInt(req.query.page) || 1, 1);
+
+    const limit = Math.min(parseInt(req.query.limit) || 24, 50);
+
+    const skip = (page - 1) * limit;
+
+    const decodedCategory = decodeURIComponent(category);
+
+    const filter = {
+      Category: {
+        $regex: `^${decodedCategory}$`,
+        $options: "i",
+      },
+    };
+
+    const [prompts, total] = await Promise.all([
+      Prompt.find(filter)
+        .sort({
+          createdAt: -1,
+        })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+
+      Prompt.countDocuments(filter),
+    ]);
+
+    res.status(200).json({
+      prompts,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    });
+  } catch (err) {
+    console.error("GET CATEGORY PROMPTS ERROR:", err);
+
+    res.status(500).json({
+      message: "Failed to fetch category prompts",
+      error: err.message,
+    });
+  }
+});
+
+/* =========================
+   SEARCH
+========================= */
 
 app.get("/api/search", async (req, res) => {
   try {
@@ -156,6 +309,7 @@ app.get("/api/search", async (req, res) => {
 /* =========================
    GET SINGLE PROMPT
 ========================= */
+
 app.get("/api/prompts/:id", async (req, res) => {
   try {
     const prompt = await Prompt.findById(req.params.id);
@@ -173,6 +327,10 @@ app.get("/api/prompts/:id", async (req, res) => {
     });
   }
 });
+
+/* =========================
+   GET PROMPT BY SLUG
+========================= */
 
 app.get("/api/prompts/slug/:slug", async (req, res) => {
   try {
@@ -223,20 +381,21 @@ app.post("/api/prompts/:id/view", async (req, res) => {
 /* =========================
    TRENDING PROMPTS
 ========================= */
+
 app.get("/api/trending", async (req, res) => {
   try {
     const data = await Prompt.aggregate([
       {
         $sort: {
-          _id: -1, // latest posts first
+          _id: -1,
         },
       },
       {
-        $limit: 100, // latest 100 posts
+        $limit: 100,
       },
       {
         $sample: {
-          size: 50, // shuffle those 100 posts
+          size: 50,
         },
       },
     ]);
@@ -250,8 +409,9 @@ app.get("/api/trending", async (req, res) => {
 });
 
 /* =========================
-   GET ADS WITH PRIORITY
+   GET ADS
 ========================= */
+
 app.get("/api/ads", async (req, res) => {
   try {
     const ads = await Ad.find({
@@ -288,13 +448,18 @@ app.get("/api/ads", async (req, res) => {
   }
 });
 
+/* =========================
+   CREATE PROMPT
+========================= */
+
 app.post("/api/prompts", async (req, res) => {
   try {
     req.body.slug = await generateSlug(req.body.Prompt);
 
     const prompt = await Prompt.create(req.body);
 
-    // Telegram Upload
+    /* Telegram */
+
     try {
       await sendTelegramPost(prompt);
     } catch (e) {
@@ -303,11 +468,17 @@ app.post("/api/prompts", async (req, res) => {
 
     res.status(201).json(prompt);
   } catch (err) {
+    console.error("CREATE PROMPT ERROR:", err);
+
     res.status(500).json({
       message: err.message,
     });
   }
 });
+
+/* =========================
+   UPDATE PROMPT
+========================= */
 
 app.put("/api/prompts/:id", async (req, res) => {
   try {
@@ -336,6 +507,10 @@ app.put("/api/prompts/:id", async (req, res) => {
   }
 });
 
+/* =========================
+   DELETE PROMPT
+========================= */
+
 app.delete("/api/prompts/:id", async (req, res) => {
   try {
     const deletedPrompt = await Prompt.findByIdAndDelete(req.params.id);
@@ -351,13 +526,16 @@ app.delete("/api/prompts/:id", async (req, res) => {
       message: "Deleted Successfully",
     });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      message: err.message,
+    });
   }
 });
 
 /* =========================
-   AD VIEW COUNT
+   AD VIEW
 ========================= */
+
 app.post("/api/ads/:id/view", async (req, res) => {
   try {
     await Ad.findByIdAndUpdate(req.params.id, {
@@ -377,8 +555,9 @@ app.post("/api/ads/:id/view", async (req, res) => {
 });
 
 /* =========================
-   AD CLICK COUNT
+   AD CLICK
 ========================= */
+
 app.post("/api/ads/:id/click", async (req, res) => {
   try {
     await Ad.findByIdAndUpdate(req.params.id, {
@@ -397,11 +576,17 @@ app.post("/api/ads/:id/click", async (req, res) => {
   }
 });
 
+/* =====================================================
+   SITEMAP
+===================================================== */
+
 app.get("/sitemap.xml", async (req, res) => {
   try {
     const smStream = new SitemapStream({
       hostname: "https://mvrprompts.com",
     });
+
+    /* HOME */
 
     smStream.write({
       url: "/",
@@ -409,13 +594,51 @@ app.get("/sitemap.xml", async (req, res) => {
       priority: 1.0,
     });
 
+    /* IMAGES */
+
     smStream.write({
       url: "/images",
+      changefreq: "daily",
+      priority: 0.8,
     });
+
+    /* VIDEOS */
 
     smStream.write({
       url: "/videos",
+      changefreq: "daily",
+      priority: 0.8,
     });
+
+    /* CATEGORIES */
+
+    smStream.write({
+      url: "/categories",
+      changefreq: "weekly",
+      priority: 0.9,
+    });
+
+    const categories = await Prompt.distinct("Category");
+
+    categories.forEach((category) => {
+      if (!category) return;
+
+      const slug = String(category)
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+
+      if (slug) {
+        smStream.write({
+          url: `/categories/${slug}`,
+          changefreq: "daily",
+          priority: 0.7,
+        });
+      }
+    });
+
+    /* PROMPTS */
 
     const prompts = await Prompt.find({}, "slug updatedAt");
 
@@ -435,8 +658,11 @@ app.get("/sitemap.xml", async (req, res) => {
     const sitemap = await streamToPromise(smStream);
 
     res.header("Content-Type", "application/xml");
+
     res.send(sitemap.toString());
   } catch (err) {
+    console.error("SITEMAP ERROR:", err);
+
     res.status(500).send(err.message);
   }
 });
@@ -444,6 +670,7 @@ app.get("/sitemap.xml", async (req, res) => {
 /* =========================
    SERVER
 ========================= */
+
 app.listen(process.env.PORT, () => {
   console.log(`Server running on port ${process.env.PORT}`);
 });

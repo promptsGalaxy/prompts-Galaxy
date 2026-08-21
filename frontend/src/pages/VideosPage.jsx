@@ -1,7 +1,6 @@
 import { Fragment, useEffect, useRef, useState } from "react";
 import API from "../api";
 import { Helmet } from "react-helmet-async";
-import CategoryFilter from "../components/CategoryFilter";
 import AdCard from "../components/AdCard";
 import Loader from "../components/Loader";
 
@@ -13,21 +12,21 @@ import NoVideos from "../components/NoVideos";
 
 function VideosPage() {
   const navigate = useNavigate();
+
   const [videos, setVideos] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState("all");
   const [muted, setMuted] = useState(true);
   const [ads, setAds] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const videoRefs = useRef([]);
 
+  // Fetch Videos
   useEffect(() => {
     fetchVideos();
-  }, [selectedCategory]);
+  }, []);
 
+  // Fetch Ads
   useEffect(() => {
-    fetchCategories();
     fetchAds();
   }, []);
 
@@ -36,25 +35,15 @@ function VideosPage() {
       const res = await API.get("/api/prompts", {
         params: {
           mediaType: "video",
-          category: selectedCategory,
         },
       });
 
       setVideos(res.data);
       videoRefs.current = [];
     } catch (err) {
-      console.error(err);
+      console.error("Error fetching videos:", err);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchCategories = async () => {
-    try {
-      const res = await API.get("/api/categories");
-      setCategories(res.data);
-    } catch (err) {
-      console.error(err);
     }
   };
 
@@ -67,6 +56,7 @@ function VideosPage() {
     }
   };
 
+  // Auto play / pause videos based on visibility
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -116,13 +106,6 @@ function VideosPage() {
       </Helmet>
 
       <Title />
-      <div className="reels-categories">
-        <CategoryFilter
-          categories={categories}
-          selectedCategory={selectedCategory}
-          setSelectedCategory={setSelectedCategory}
-        />
-      </div>
 
       <div className="reels-container">
         {videos.map((item, index) => (
@@ -143,6 +126,7 @@ function VideosPage() {
                   <button className="mute-btn" onClick={() => setMuted(!muted)}>
                     {muted ? "🔇 Unmute" : "🔊 Mute"}
                   </button>
+
                   <button
                     className="prompt-btn"
                     onClick={() => navigate(`/prompt/${item.slug}`)}
@@ -153,16 +137,18 @@ function VideosPage() {
               </div>
             </div>
 
-            {/* Ad Reel */}
+            {/* Ad Reel after every 6 videos */}
             {ads.length > 0 && (index + 1) % 6 === 0 && (
               <div className="reel-item">
                 <div className="ad-reel">
-                  <AdCard ad={ads[Math.floor(index / 3) % ads.length]} />
+                  <AdCard ad={ads[Math.floor(index / 6) % ads.length]} />
                 </div>
               </div>
             )}
           </Fragment>
         ))}
+
+        {/* No Videos */}
         {videos.length === 0 && <NoVideos />}
 
         <Footer />
