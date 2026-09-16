@@ -387,10 +387,6 @@ export default function Categories() {
 
                           <h3>{category.name}</h3>
 
-                          {/* DESCRIPTION */}
-
-                          <p>{description}</p>
-
                           {/* EXPLORE */}
 
                           <div className="category-explore">
