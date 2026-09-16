@@ -107,7 +107,7 @@ app.get("/api/prompts", async (req, res) => {
       },
       {
         $sample: {
-          size: 100,
+          size: 400,
         },
       },
     ]);
