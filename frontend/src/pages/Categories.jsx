@@ -343,8 +343,6 @@ export default function Categories() {
                   <div className="category-section-header">
                     <div>
                       <h2>{section.title}</h2>
-
-                      <p>{section.description}</p>
                     </div>
                   </div>
 
